@@ -21,7 +21,6 @@ BOOK_URL = "https://platform.virdocs.com/spine/XXXXXXX/{}"
 if not os.path.exists(PAGE_PATH):
     os.mkdir(PAGE_PATH)
 
-
 def create_session() -> requests.Session:
     session = requests.Session()
     retries = Retry(total=5, backoff_factor=0.1)
@@ -100,7 +99,6 @@ def convert_html_to_pdf(page: int):
     file.close()
 
 
-
 def merge_pdf_files():
     main_pdf = pymupdf.open(f"{PAGE_PATH}/1/1.pdf")
 
@@ -134,7 +132,6 @@ for i in range(0, NUM_THREADS):
     start += chunk_size
     threads.append(thread)
 
-
 for thread in threads:
     thread.join()
 
@@ -146,7 +143,6 @@ for i in range(0, NUM_THREADS):
     thread.start()
     start += chunk_size
     threads.append(thread)
-
 
 for thread in threads:
     thread.join()
