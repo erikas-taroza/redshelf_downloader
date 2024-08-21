@@ -15,7 +15,7 @@ COOKIES = {
     "csrftoken": "",
     "session_id": ""
 }
-NUM_PAGES = 2784
+NUM_PAGES = 1
 BOOK_URL = "https://platform.virdocs.com/spine/XXXXXXX/{}"
 
 if not os.path.exists(PAGE_PATH):
@@ -89,16 +89,19 @@ def download_page(page: int):
 
 
 def convert_html_to_pdf(page: int):
-    file = open(Path(f"{PAGE_PATH}/{page}/html/{page}.html"), "r")
+    file = open(Path(f"{PAGE_PATH}/{page}/html/{page}.html"), "r", encoding="utf-8")
     html = file.read()
 
-    path = Path(f"{PAGE_PATH}/{page}")
-    # Make hrefs absolute
-    html = re.sub("href=\"([.]{2})", f"href=\"{os.path.abspath(path)}", html)
-    # Make srcs absolute
-    html = re.sub("src=\"([.]{2})", f"src=\"{os.path.abspath(path)}", html)
+    def make_path(property: str, file_path: str) -> str:
+        path = os.path.abspath(Path(f"{PAGE_PATH}/{page}/{file_path}"))
+        return f"{property}=\"{path}\""
 
-    pdfkit.from_string(html, Path(f"{PAGE_PATH}/{page}/{page}.pdf"), options={"enable-local-file-access": ""})
+    # Make hrefs absolute
+    html = re.sub("href=\"([.]{2})(.*?)\"", lambda match : make_path("href", match.group(2)), html)
+    # Make srcs absolute
+    html = re.sub("src=\"([.]{2})(.*?)\"", lambda match : make_path("src", match.group(2)), html)
+
+    pdfkit.from_string(html, str(Path(f"{PAGE_PATH}/{page}/{page}.pdf")), options={"enable-local-file-access": ""})
     file.close()
 
 
