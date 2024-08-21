@@ -9,10 +9,13 @@ Each page is stored in an independent folder so if you want to compile the textb
 - requests
 - pdfkit
 - pymupdf
+- wkhtmltopdf (not from pip)
 
 ```sh
 pip install requests pdfkit pymupdf
 ```
+
+Install `wkhtmltopdf` using your package manager or from [their website](https://wkhtmltopdf.org/downloads.html). Make sure that it is added to your PATH environment variable as well.
 
 ## Configure
 
