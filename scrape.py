@@ -79,7 +79,7 @@ def download_page(page: int):
     path = Path(f"{PAGE_PATH}/{page}")
 
     if not os.path.exists(path):
-        os.mkdir(f"{PAGE_PATH}/{page}")
+        os.mkdir(path)
 
     raw = get_raw_html(page)
     base_url = get_base_url(raw)
@@ -89,8 +89,7 @@ def download_page(page: int):
 
 
 def convert_html_to_pdf(page: int):
-    file = open(Path(f"{PAGE_PATH}/{page}/html/{page}.html"), "r", encoding="utf-8")
-    html = file.read()
+    html = Path(f"{PAGE_PATH}/{page}/html/{page}.html").read_text(encoding="utf-8")
 
     def make_path(property: str, file_path: str) -> str:
         path = os.path.abspath(Path(f"{PAGE_PATH}/{page}/{file_path}"))
@@ -102,7 +101,6 @@ def convert_html_to_pdf(page: int):
     html = re.sub("src=\"([.]{2})(.*?)\"", lambda match : make_path("src", match.group(2)), html)
 
     pdfkit.from_string(html, str(Path(f"{PAGE_PATH}/{page}/{page}.pdf")), options={"enable-local-file-access": ""})
-    file.close()
 
 
 def merge_pdf_files():
