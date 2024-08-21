@@ -30,15 +30,12 @@ def create_session() -> requests.Session:
 
 def get_raw_html(page: int) -> str:
     session = create_session()
-
     response = session.get(BOOK_URL.format(page), allow_redirects=True, cookies=COOKIES)
-    raw_url = response.history[0].headers.get("Location")
-    response = session.get(raw_url, cookies=COOKIES)
     return response.text
 
 
 def get_base_url(raw: str) -> str:
-    return re.search("<base href=\"(.*?/OPS).*\"/>", raw).group(1)
+    return re.search("<base href=\"(.*?/(OPS|OEBPS)).*\"/>", raw).group(1)
 
 
 def get_remote_urls(raw: str) -> list[str]:
