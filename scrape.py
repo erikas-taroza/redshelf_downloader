@@ -7,11 +7,11 @@ import threading
 from requests.adapters import HTTPAdapter, Retry
 from pathlib import Path
 
-NUM_THREADS = 8
+NUM_THREADS = 1
 PAGE_PATH = "pages"
 COOKIES = {
-    "AMP_d698e26b82": "==",
-    "AMP_MKTG_d698e26b82": "=",
+    "AMP_d698e26b82": "",
+    "AMP_MKTG_d698e26b82": "",
     "csrftoken": "",
     "session_id": ""
 }
@@ -76,7 +76,9 @@ def create_html_file(page: int, raw: str):
 
 
 def download_page(page: int):
-    if not os.path.exists(f"{PAGE_PATH}/{page}"):
+    path = Path(f"{PAGE_PATH}/{page}")
+
+    if not os.path.exists(path):
         os.mkdir(f"{PAGE_PATH}/{page}")
 
     raw = get_raw_html(page)
@@ -87,23 +89,24 @@ def download_page(page: int):
 
 
 def convert_html_to_pdf(page: int):
-    file = open(f"{PAGE_PATH}/{page}/html/{page}.html", "r")
+    file = open(Path(f"{PAGE_PATH}/{page}/html/{page}.html"), "r")
     html = file.read()
 
+    path = Path(f"{PAGE_PATH}/{page}")
     # Make hrefs absolute
-    html = re.sub("href=\"([.]{2})", f"href=\"{os.path.abspath(f"{PAGE_PATH}/{page}")}", html)
+    html = re.sub("href=\"([.]{2})", f"href=\"{os.path.abspath(path)}", html)
     # Make srcs absolute
-    html = re.sub("src=\"([.]{2})", f"src=\"{os.path.abspath(f"{PAGE_PATH}/{page}")}", html)
+    html = re.sub("src=\"([.]{2})", f"src=\"{os.path.abspath(path)}", html)
 
-    pdfkit.from_string(html, f"{PAGE_PATH}/{page}/{page}.pdf", options={"enable-local-file-access": ""})
+    pdfkit.from_string(html, Path(f"{PAGE_PATH}/{page}/{page}.pdf"), options={"enable-local-file-access": ""})
     file.close()
 
 
 def merge_pdf_files():
-    main_pdf = pymupdf.open(f"{PAGE_PATH}/1/1.pdf")
+    main_pdf = pymupdf.open(Path(f"{PAGE_PATH}/1/1.pdf"))
 
     for i in range(2, NUM_PAGES + 1):
-        main_pdf.insert_pdf(pymupdf.open(f"{PAGE_PATH}/{i}/{i}.pdf"))
+        main_pdf.insert_pdf(pymupdf.open(Path(f"{PAGE_PATH}/{i}/{i}.pdf")))
 
     main_pdf.save("result.pdf")
 
