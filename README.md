@@ -44,6 +44,10 @@ https://platform.virdocs.com/read/book_id/page_number
 
 In `BOOK_URL` replace the X's with the book ID. Update `NUM_PAGES` with the page number in the URL, not in the UI of the website.
 
+### NUM_THREADS
+
+The number of threads to use to download the book. The higher the number, the faster the book will download. Make sure that the number specificed can evenly divided `NUM_PAGES`. For example, if you have 10 pages, `NUM_THREADS` can be 1, 2, 5, or 10. It cannot be 4 because 10/4 is not a whole number.
+
 ## Usage
 
 ```sh
