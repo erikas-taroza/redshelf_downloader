@@ -121,32 +121,70 @@ def convert_thread(start: int, end: int):
         convert_html_to_pdf(i)
 
 
-assert(NUM_PAGES % NUM_THREADS == 0)
+#assert(NUM_PAGES % NUM_THREADS == 0)
 chunk_size = int(NUM_PAGES / NUM_THREADS)
 
 # Download threads
 threads: list[threading.Thread] = []
-start = 1
-for i in range(0, NUM_THREADS):
-    thread = threading.Thread(target=download_thread, args=(start, start + chunk_size))
+
+def multi_thread():
+    start = 1
+    for i in range(0, NUM_THREADS - 1):
+        thread = threading.Thread(target=download_thread, args=(start, start + chunk_size))
+        thread.start()
+        start += chunk_size
+        threads.append(thread)
+
+    thread = threading.Thread(target=download_thread, args=(start, NUM_PAGES + 1))
     thread.start()
-    start += chunk_size
     threads.append(thread)
 
-for thread in threads:
-    thread.join()
+    for thread in threads:
+        thread.join()
 
-# Convert threads
-threads = []
-start = 1
-for i in range(0, NUM_THREADS):
-    thread = threading.Thread(target=convert_thread, args=(start, start + chunk_size))
+    # Convert threads
+    threads = []
+    start = 1
+    for i in range(0, NUM_THREADS - 1):
+        thread = threading.Thread(target=convert_thread, args=(start, start + chunk_size))
+        thread.start()
+        start += chunk_size
+        threads.append(thread)
+
+    thread = threading.Thread(target=convert_thread, args=(start, NUM_PAGES + 1))
     thread.start()
-    start += chunk_size
     threads.append(thread)
 
-for thread in threads:
-    thread.join()
+    for thread in threads:
+        thread.join()
+
+def single_thread():
+    start = 1
+    for i in range(0, NUM_THREADS):
+        thread = threading.Thread(target=download_thread, args=(start, start + chunk_size))
+        thread.start()
+        start += chunk_size
+        threads.append(thread)
+
+    for thread in threads:
+        thread.join()
+
+    # Convert threads
+    threads = []
+    start = 1
+    for i in range(0, NUM_THREADS):
+        thread = threading.Thread(target=convert_thread, args=(start, start + chunk_size))
+        thread.start()
+        start += chunk_size
+        threads.append(thread)
+
+    for thread in threads:
+        thread.join()
+
+if(NUM_THREADS > 1):
+    multi_thread()
+else:
+    single_thread()
 
 print("Merging PDF files")
 merge_pdf_files()
