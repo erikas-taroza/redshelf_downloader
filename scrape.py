@@ -124,10 +124,9 @@ def convert_thread(start: int, end: int):
 #assert(NUM_PAGES % NUM_THREADS == 0)
 chunk_size = int(NUM_PAGES / NUM_THREADS)
 
-# Download threads
-threads: list[threading.Thread] = []
-
 def multi_thread():
+    # Download threads
+    threads: list[threading.Thread] = []
     start = 1
     for i in range(0, NUM_THREADS - 1):
         thread = threading.Thread(target=download_thread, args=(start, start + chunk_size))
@@ -159,6 +158,8 @@ def multi_thread():
         thread.join()
 
 def single_thread():
+    # Download threads
+    threads: list[threading.Thread] = []
     start = 1
     for i in range(0, NUM_THREADS):
         thread = threading.Thread(target=download_thread, args=(start, start + chunk_size))
