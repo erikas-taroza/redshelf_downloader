@@ -4,8 +4,6 @@ Downloads the content of each page of the textbook and converts it to a PDF file
 
 Each page is stored in an independent folder so if you want to compile the textbook in a different way, you can.
 
-This fork has an improved version of multithreading
-
 ## Dependencies
 
 - requests
