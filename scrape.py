@@ -120,14 +120,13 @@ def convert_thread(start: int, end: int):
         print(f"[{threading.current_thread().name}] Converting page {i} to PDF")
         convert_html_to_pdf(i)
 
-
-#assert(NUM_PAGES % NUM_THREADS == 0)
 chunk_size = int(NUM_PAGES / NUM_THREADS)
 
-def multi_thread():
-    # Download threads
-    threads: list[threading.Thread] = []
-    start = 1
+# Download threads
+threads: list[threading.Thread] = []
+start = 1
+
+if(NUM_THREADS > 1):
     for i in range(0, NUM_THREADS - 1):
         thread = threading.Thread(target=download_thread, args=(start, start + chunk_size))
         thread.start()
@@ -157,10 +156,7 @@ def multi_thread():
     for thread in threads:
         thread.join()
 
-def single_thread():
-    # Download threads
-    threads: list[threading.Thread] = []
-    start = 1
+if(NUM_THREADS == 1):
     for i in range(0, NUM_THREADS):
         thread = threading.Thread(target=download_thread, args=(start, start + chunk_size))
         thread.start()
@@ -181,11 +177,6 @@ def single_thread():
 
     for thread in threads:
         thread.join()
-
-if(NUM_THREADS > 1):
-    multi_thread()
-else:
-    single_thread()
 
 print("Merging PDF files")
 merge_pdf_files()
