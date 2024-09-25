@@ -21,6 +21,9 @@ BOOK_URL = "https://platform.virdocs.com/spine/XXXXXXX/{}"
 if not os.path.exists(PAGE_PATH):
     os.mkdir(PAGE_PATH)
 
+CSS_REGEX = "<link.*?href=\"(.*?)\""
+IMG_REGEX = "<img.*?src=\"(.*?)\""
+
 def create_session() -> requests.Session:
     session = requests.Session()
     retries = Retry(total=5, backoff_factor=0.1)
@@ -39,16 +42,29 @@ def get_base_url(raw: str) -> str:
 
 
 def get_remote_urls(raw: str) -> list[str]:
-    hrefs = re.finditer("href=\"..(/.*?)\"", raw)
-    srcs = re.finditer("src=\"..(/.*?)\"", raw)
+    css = re.finditer(CSS_REGEX, raw)
+    imgs = re.finditer(IMG_REGEX, raw)
 
     remote = []
 
-    for href in hrefs:
-        remote.append(href.group(1))
+    # The format for the remote url is as follows:
+    # /path/to/resource
+    # The src/href that the regex picks up can come in different formats. For example:
+    # 1. ../path/to/resource
+    # 2. path/to/resource
+    for css in css:
+        parsed = css.group(1).replace("..", "")
+        if parsed[0] != "/":
+            parsed = f"/{parsed}"
 
-    for src in srcs:
-        remote.append(src.group(1))
+        remote.append(parsed)
+
+    for img in imgs:
+        parsed = img.group(1).replace("..", "")
+        if parsed[0] != "/":
+            parsed = f"/{parsed}"
+
+        remote.append(parsed)
 
     return remote
 
@@ -58,17 +74,42 @@ def download_remote_resources(page: int, base_url: str, urls: list[str]):
     path = f"{PAGE_PATH}/{page}"
 
     for url in urls:
-        response = session.get(f"{base_url}{url}", cookies=COOKIES)
-        
+        request_url = url
+        # Static is a universal file not dependent on the book.
+        if "/static" in url:
+            request_url = f"https://platform.virdocs.com{url}"
+        else:
+            request_url = f"{base_url}{url}"
+
+        response = session.get(request_url, allow_redirects=True, cookies=COOKIES)
         file = Path(f"{path}{url}")
         file.parent.mkdir(parents=True, exist_ok=True)
         file.write_bytes(response.content)
 
 
 def create_html_file(page: int, raw: str):
+    # The format for the path to the file is as follows:
+    # ../path/to/resource
+    # The page can have different formats for a file. For example:
+    # 1. /path/to/resource
+    # 2. path/to/resource
+    def parse_downloaded_file(match: re.Match[str]) -> str:
+        parsed = match.group(1)
+
+        if parsed[0] != "/":
+            parsed = f"/{parsed}"
+
+        if ".." not in parsed:
+            parsed = f"..{parsed}"
+
+        return match.group(0).replace(match.group(1), parsed)
+
     file = Path(f"{PAGE_PATH}/{page}/html/{page}.html")
     file.parent.mkdir(parents=True, exist_ok=True)
-    parsed_raw = re.sub("<base .*/>", "", raw)
+    parsed_raw = re.sub("<base .*?/>", "", raw)
+    parsed_raw = re.sub("<script.*?>", "", parsed_raw)
+    parsed_raw = re.sub(CSS_REGEX, parse_downloaded_file, parsed_raw)
+    parsed_raw = re.sub(IMG_REGEX, parse_downloaded_file, parsed_raw)
     file.write_text(parsed_raw, encoding="utf-8")
 
 
