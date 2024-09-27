@@ -38,8 +38,14 @@ def get_raw_html(page: int) -> str:
 
 
 def get_base_url(raw: str) -> str:
-    return re.search("<base href=\"(.*?/(OPS|OEBPS)).*\"/>", raw).group(1)
-
+    match = re.search("<base href=\"(.*?/epub).*\"/>", raw)
+    if match:
+        base_url = match.group(1)
+        print(f"Found base URL: {base_url}")
+        return base_url
+    else:
+        print("Could not find 'epub' in the base href. Raw HTML may not contain expected content.")
+        return None
 
 def get_remote_urls(raw: str) -> list[str]:
     css = re.finditer(CSS_REGEX, raw)
