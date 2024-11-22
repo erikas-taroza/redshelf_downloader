@@ -96,7 +96,7 @@ def create_html_file(page: int, raw: str):
     def parse_downloaded_file(match: re.Match[str]) -> str:
         parsed = match.group(1)
 
-        if parsed[0] != "/":
+        if parsed[0] != "/" and ".." not in parsed:
             parsed = f"/{parsed}"
 
         if ".." not in parsed:
