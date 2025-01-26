@@ -13,19 +13,18 @@ class Config:
     def __init__(self):
         if not os.path.exists("config.json"):
             with open("config.json", "w") as config:
-                config.write("""
-                    {
-                        "num_threads": 1,
-                        "num_pages": 1,
-                        "download_path": "pages",
-                        "book_id": "XXXXXXX",
-                        "cookies": {
-                            "AMP_d698e26b82": "",
-                            "AMP_MKTG_d698e26b82": "",
-                            "csrftoken": "",
-                            "session_id": ""
-                        }
-                    }""")
+                config.write("""{
+    "num_threads": 1,
+    "num_pages": 1,
+    "download_path": "pages",
+    "book_id": "XXXXXXX",
+    "cookies": {
+        "AMP_d698e26b82": "",
+        "AMP_MKTG_d698e26b82": "",
+        "csrftoken": "",
+        "session_id": ""
+    }
+}""")
 
         config_file = open("config.json", "r")
         config = json.loads(config_file.read())
@@ -35,7 +34,6 @@ class Config:
         self.download_path = config["download_path"]
         self.book_id = config["book_id"]
         self.cookies = config["cookies"]
-        print(self.cookies.values())
 
     def validate(self):
         if (
