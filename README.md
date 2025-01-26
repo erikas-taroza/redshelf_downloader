@@ -19,37 +19,41 @@ Install `wkhtmltopdf` using your package manager or from [their website](https:/
 
 ## Configure
 
-```py
-NUM_THREADS = 8
-PAGE_PATH = "pages"
-COOKIES = {
-    "AMP_d698e26b82": "==",
-    "AMP_MKTG_d698e26b82": "=",
+Before using this tool, you must configure the `config.json` file. It should look something like this:
+
+```json
+{
+  "num_threads": 1,
+  "num_pages": 1,
+  "download_path": "pages",
+  "book_id": "",
+  "cookies": {
+    "AMP_d698e26b82": "",
+    "AMP_MKTG_d698e26b82": "",
     "csrftoken": "",
     "session_id": ""
+  }
 }
-NUM_PAGES = 0
-BOOK_URL = "https://platform.virdocs.com/spine/XXXXXXX/{}"
 ```
 
-To get the values for `COOKIES`, `NUM_PAGES`, and `BOOK_URL`, open the textbook in the browser.
+To get the values for `cookies`, `num_pages`, and `book_id`, open the textbook in the browser.
 
-### COOKIES
+### Cookies
 
 Enter the browser's devtools and inspect a network request for the page (in the file column, it should be a single number). Click on the request and copy and paste the cookies into the file.
 
-### NUM_PAGES / BOOK_URL
+### Num Pages / Book ID
 
 Go all the way to the end of the textbook and look at the url.
 
 The url should be formatted like so:
 https://platform.virdocs.com/read/book_id/page_number
 
-In `BOOK_URL` replace the X's with the book ID. Update `NUM_PAGES` with the page number in the URL, not in the UI of the website.
+In `book_id` replace the X's with the book ID in the url. Update `num_pages` with the page number in the URL, not in the UI of the website.
 
-### NUM_THREADS
+### Num Threads
 
-The number of threads to use to download the book. The higher the number, the faster the book will download. Make sure that the number specificed can evenly divided `NUM_PAGES`. For example, if you have 10 pages, `NUM_THREADS` can be 1, 2, 5, or 10. It cannot be 4 because 10/4 is not a whole number.
+The number of threads to use to download the book. The higher the number, the faster the book will download but you may run into rate limits at higher numbers.
 
 ## Usage
 
