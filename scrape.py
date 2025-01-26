@@ -33,12 +33,11 @@ if __name__ == "__main__":
     if not os.path.exists(config.download_path):
         os.mkdir(config.download_path)
 
-    assert config.num_pages % config.num_threads == 0
     chunk_size = int(config.num_pages / config.num_threads)
 
     threads = []
     start = 1
-    for i in range(0, config.num_threads):
+    for i in range(0, config.num_threads - 1):
         thread = threading.Thread(
             target=download_thread, args=(start, start + chunk_size, config)
         )
@@ -46,18 +45,30 @@ if __name__ == "__main__":
         start += chunk_size
         threads.append(thread)
 
+    thread = threading.Thread(
+        target=download_thread, args=(start, config.num_pages + 1, config)
+    )
+    thread.start()
+    threads.append(thread)
+
     for thread in threads:
         thread.join()
 
     threads = []
     start = 1
-    for i in range(0, config.num_threads):
+    for i in range(0, config.num_threads - 1):
         thread = threading.Thread(
             target=convert_thread, args=(start, start + chunk_size, config)
         )
         thread.start()
         start += chunk_size
         threads.append(thread)
+
+    thread = threading.Thread(
+        target=convert_thread, args=(start, config.num_pages + 1, config)
+    )
+    thread.start()
+    threads.append(thread)
 
     for thread in threads:
         thread.join()
