@@ -28,8 +28,8 @@ class Config:
             )
             sys.exit(0)
 
-        config_file = open("config.json", "r")
-        config = json.loads(config_file.read())
+        with open("config.json", "r") as config_file:
+            config = json.load(config_file)
 
         self.num_threads = config["num_threads"]
         self.num_pages = config["num_pages"]
