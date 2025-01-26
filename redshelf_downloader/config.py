@@ -17,7 +17,7 @@ class Config:
     "num_threads": 1,
     "num_pages": 1,
     "download_path": "pages",
-    "book_id": "XXXXXXX",
+    "book_id": "",
     "cookies": {
         "AMP_d698e26b82": "",
         "AMP_MKTG_d698e26b82": "",
@@ -25,6 +25,10 @@ class Config:
         "session_id": ""
     }
 }""")
+            print(
+                "Generated `config.json`. Please configure the file and then re-run the program."
+            )
+            sys.exit(0)
 
         config_file = open("config.json", "r")
         config = json.loads(config_file.read())
