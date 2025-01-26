@@ -4,50 +4,43 @@ import threading
 from pathlib import Path
 from redshelf_downloader.download import Download
 from redshelf_downloader.convert_to_pdf import ConvertToPdf
-
-NUM_THREADS = 1
-PAGE_PATH = "pages"
-COOKIES = {
-    "AMP_d698e26b82": "",
-    "AMP_MKTG_d698e26b82": "",
-    "csrftoken": "",
-    "session_id": "",
-}
-NUM_PAGES = 1
-BOOK_ID = "XXXXXXX"
+from redshelf_downloader.config import Config
 
 
-def merge_pdf_files():
-    main_pdf = pymupdf.open(Path(f"{PAGE_PATH}/1/1.pdf"))
-    for i in range(2, NUM_PAGES + 1):
-        main_pdf.insert_pdf(pymupdf.open(Path(f"{PAGE_PATH}/{i}/{i}.pdf")))
+def merge_pdf_files(download_path: str, num_pages: int):
+    main_pdf = pymupdf.open(Path(f"{download_path}/1/1.pdf"))
+    for i in range(2, num_pages + 1):
+        main_pdf.insert_pdf(pymupdf.open(Path(f"{download_path}/{i}/{i}.pdf")))
     main_pdf.save("result.pdf")
 
 
-def download_thread(start: int, end: int):
+def download_thread(start: int, end: int, config: Config):
     for i in range(start, end):
         print(f"[{threading.current_thread().name}] Downloading page {i}")
-        Download(BOOK_ID, i).download(PAGE_PATH, COOKIES)
+        Download(config.book_id, i).download(config.download_path, config.cookies)
 
 
-def convert_thread(start: int, end: int):
+def convert_thread(start: int, end: int, config: Config):
     for i in range(start, end):
         print(f"[{threading.current_thread().name}] Converting page {i} to PDF")
-        ConvertToPdf(PAGE_PATH, i).convert()
+        ConvertToPdf(config.download_path, i).convert()
 
 
 if __name__ == "__main__":
-    if not os.path.exists(PAGE_PATH):
-        os.mkdir(PAGE_PATH)
+    config = Config()
+    config.validate()
 
-    assert NUM_PAGES % NUM_THREADS == 0
-    chunk_size = int(NUM_PAGES / NUM_THREADS)
+    if not os.path.exists(config.download_path):
+        os.mkdir(config.download_path)
+
+    assert config.num_pages % config.num_threads == 0
+    chunk_size = int(config.num_pages / config.num_threads)
 
     threads = []
-    start = 8
-    for i in range(0, NUM_THREADS):
+    start = 1
+    for i in range(0, config.num_threads):
         thread = threading.Thread(
-            target=download_thread, args=(start, start + chunk_size)
+            target=download_thread, args=(start, start + chunk_size, config)
         )
         thread.start()
         start += chunk_size
@@ -58,9 +51,9 @@ if __name__ == "__main__":
 
     threads = []
     start = 1
-    for i in range(0, NUM_THREADS):
+    for i in range(0, config.num_threads):
         thread = threading.Thread(
-            target=convert_thread, args=(start, start + chunk_size)
+            target=convert_thread, args=(start, start + chunk_size, config)
         )
         thread.start()
         start += chunk_size
@@ -70,5 +63,5 @@ if __name__ == "__main__":
         thread.join()
 
     print("Merging PDF files")
-    merge_pdf_files()
+    merge_pdf_files(config.download_path, config.num_pages)
     print("Complete!")
