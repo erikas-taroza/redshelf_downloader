@@ -36,8 +36,6 @@ It should look something like this:
   "download_path": "pages",
   "book_id": "",
   "cookies": {
-    "AMP_d698e26b82": "",
-    "AMP_MKTG_d698e26b82": "",
     "csrftoken": "",
     "session_id": ""
   }

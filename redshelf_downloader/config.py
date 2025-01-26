@@ -19,8 +19,6 @@ class Config:
     "download_path": "pages",
     "book_id": "",
     "cookies": {
-        "AMP_d698e26b82": "",
-        "AMP_MKTG_d698e26b82": "",
         "csrftoken": "",
         "session_id": ""
     }
@@ -47,6 +45,6 @@ class Config:
             or len(list(self.cookies.values())[0]) == 0
         ):
             print(
-                "Invalid config. Please double check that the values in `config.json` are correct."
+                "Invalid config. Please double check that the `book_id` and `cookies` in `config.json` are correct."
             )
             sys.exit(1)
