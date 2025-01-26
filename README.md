@@ -25,7 +25,7 @@ python scrape.py
 
 ## Configure
 
-Before using this tool, you must configure the `config.json` file. If file is not present, run the program to automatically generate it.
+Before using this tool, you must configure the `config.json` file. If the file is not present, run the program to automatically generate it.
 
 It should look something like this:
 
@@ -59,4 +59,4 @@ In `book_id` replace the X's with the book ID in the url. Update `num_pages` wit
 
 ### Num Threads
 
-The number of threads to use to download the book. The higher the number, the faster the book will download but you may run into rate limits at higher numbers.
+The number of threads to use to download the book. The higher the number, the faster the book will download, but you may run into rate limits at higher numbers.
