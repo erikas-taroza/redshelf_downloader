@@ -39,8 +39,7 @@ class Config:
 
     def validate(self):
         if (
-            self.book_id == "XXXXXXX"
-            or len(self.book_id) == 0
+            len(self.book_id) == 0
             or len(self.cookies) == 0
             or len(list(self.cookies.values())[0]) == 0
         ):
